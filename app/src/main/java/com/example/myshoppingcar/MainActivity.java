@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ExpandableListView;
 
+import com.example.myshoppingcar.adapter.ShoppingCarAdapter;
 import com.example.myshoppingcar.bean.ShoppingCarDataBean;
 import com.google.gson.Gson;
 
@@ -78,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
             "        }\n" +
             "    ]\n" +
             "}";
+    private ExpandableListView listView;
+    private List<ShoppingCarDataBean.DatasBean> storeList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,9 +157,44 @@ public class MainActivity extends AppCompatActivity {
 //                "}";
         Gson gson = new Gson();
         ShoppingCarDataBean shoppingCarDataBean = gson.fromJson(data, ShoppingCarDataBean.class);
-        List<ShoppingCarDataBean.DatasBean> storeList = shoppingCarDataBean.getDatas();
+        storeList = shoppingCarDataBean.getDatas();
         Log.d(TAG, "store: " + storeList);
         Log.d(TAG, "good: " + storeList.get(1).getGoods());
 
+
+
+        init();
+
+        initExpandableListView();
+
+    }
+
+
+    private void init(){
+        listView = this.findViewById(R.id.elv_id);
+//        listView.setAdapter();
+    }
+
+    private void initExpandableListView(){
+        ShoppingCarAdapter adapter = new ShoppingCarAdapter(storeList);
+        listView.setAdapter(adapter);
+
+
+        //展开所有组
+        for (int i = 0; i < adapter.getGroupCount(); i++) {
+            listView.expandGroup(i);
+        }
+        listView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+                return true;
+            }
+        });
+
     }
 }
+
+
+
+
+
