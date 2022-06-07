@@ -7,7 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myshoppingcar.R;
 import com.example.myshoppingcar.bean.ShoppingCarDataBean;
@@ -23,11 +26,41 @@ import java.util.zip.Inflater;
 public class ShoppingCarAdapter extends BaseExpandableListAdapter {
     private static final String TAG = "ShoppingCarAdapter";
 
-    private final List<ShoppingCarDataBean.DatasBean> datasBeans;
+    private List<ShoppingCarDataBean.DatasBean> datasBeans;
+//    private ViewHolder holder;
+
 
     public ShoppingCarAdapter(List<ShoppingCarDataBean.DatasBean> datasBeans) {
         this.datasBeans = datasBeans;
     }
+
+//
+//    public static class ViewHolder extends RecyclerView.ViewHolder {
+//        ImageView selectIcon;
+//        public ViewHolder(View itemView){
+//            super(itemView);
+//            this.selectIcon = itemView.findViewById(R.id.select_id);
+//        }
+//    }
+//
+//    public static class ViewHolderChild  {
+//        ImageView selectIconChild;
+//        public ViewHolderChild(View itemView){
+//            this.selectIconChild = itemView.findViewById(R.id.select_id);
+//        }
+//    }
+
+//    static class GroupViewHolder {
+//        @SuppressLint("NonConstantResourceId")
+//        @BindView(R.id.select_id)
+//        ImageView ivSelect;
+//
+//
+//        GroupViewHolder(View view) {
+//            ButterKnife.bind(this, view);
+//        }
+//    }
+
 
     @Override
     public int getGroupCount() {
@@ -72,12 +105,16 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int i, boolean b, View view, ViewGroup viewGroup) {
-
+//        GroupViewHolder holder;
+//        ViewHolder holder;
         View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_group,viewGroup,false);
+//        holder = new GroupViewHolder(itemView);
+//        holder = new ViewHolder(itemView);
         ShoppingCarDataBean.DatasBean datasBean = datasBeans.get(i);
         List<ShoppingCarDataBean.DatasBean.GoodsBean> goodList = datasBean.getGoods();
         String storeId = datasBean.getStore_id();
         String storeName = datasBean.getStore_name();
+        Boolean isSelect = datasBean.getIsSelect_shop();//isSelect不可以在下面的点击事件用，因为这个值在下面用就是固定值
 
         Log.d(TAG, "-------" + storeId);
 
@@ -85,34 +122,91 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
         TextView store = itemView.findViewById(R.id.store_name);
         store.setText(storeName);
 
+
+
+        //店铺内的商品都选中的时候，店铺的也要选中
+        for (int j = 0; j < datasBean.getGoods().size(); j++) {
+            ShoppingCarDataBean.DatasBean.GoodsBean goodsBean = datasBean.getGoods().get(j);
+            boolean Select = goodsBean.getIsSelect();
+            if (Select) {
+                datasBean.setIsSelect_shop(true);
+            } else {
+                datasBean.setIsSelect_shop(false);
+                break;
+            }
+        }
+
+//        holder = new ViewHolder(itemView);
+
+        //因为set之后要重新get，所以这一块代码要放到一起执行
+        //店铺是否在购物车中被选中
+        final boolean isSelect_shop = datasBean.getIsSelect_shop();
+        if (isSelect_shop) {
+//            Log.d(TAG, "true: " + holder.selectIcon);
+            selectIcon.setImageResource(R.drawable.select);
+        } else {
+//            Log.d(TAG, "false: " + holder.selectIcon);
+            selectIcon.setImageResource(R.drawable.inselect);
+        }
+//        notifyDataSetChanged();
+
+//        for (int j = 0; j < datasBean.getGoods().size(); j++) {
+//            boolean select = datasBean.getGoods().get(i).getIsSelect();
+//            if (select){
+//
+//                datasBean.setIsSelect_shop(true);
+//            }else {
+//                datasBean.setIsSelect_shop(false);
+//                break;
+//            }
+//        }
+//        if (datasBean.getIsSelect_shop()){
+//            selectIcon.setImageResource(R.drawable.select);
+//        }else {
+//            selectIcon.setImageResource(R.drawable.inselect);
+//        }
+
+
+
         selectIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 boolean isSelect = datasBean.getIsSelect_shop();
-                if (!isSelect){
-                    selectIcon.setImageResource(R.drawable.select);
-//                    for (int j = 0; j < datasBean.getGoods().size(); j++) {
-//                        boolean select = datasBean.getGoods().get(i).getIsSelect();
-//                        if (select){
-//                            datasBean.setIsSelect_shop(true);
-//                        }else {
-//                            datasBean.setIsSelect_shop(false);
-//                            break;
-//                        }
-//                    }
-//                    if (datasBean.getIsSelect_shop()){
-//                        selectIcon.setImageResource(R.drawable.select);
-//                    }else {
-//                        selectIcon.setImageResource(R.drawable.inselect);
-//                    }
-                    datasBean.setIsSelect_shop(true);
-                    return;
+                datasBean.setIsSelect_shop(!isSelect);
+                Log.d(TAG, "onClick: " + datasBean.getIsSelect_shop());
+
+                for (int i = 0; i < datasBean.getGoods().size(); i++) {
+                    datasBean.getGoods().get(i).setIsSelect(!isSelect);
                 }
-                selectIcon.setImageResource(R.drawable.inselect);
-                datasBean.setIsSelect_shop(false);
+                notifyDataSetChanged();
+
+//                if (datasBean.getIsSelect_shop()){
+//                    selectIcon.setImageResource(R.drawable.select);
+//
+//                }else {
+//                    selectIcon.setImageResource(R.drawable.inselect);
+//                }
+
+
+
+
+
+
+
+//                boolean isSelect = datasBean.getIsSelect_shop();
+//                Log.d(TAG, "onClick: " + isSelect);
+//                if (!isSelect){
+//                    selectIcon.setImageResource(R.drawable.select);
+//                    datasBean.setIsSelect_shop(true);
+//
+//                    return;
+//                }
+//                selectIcon.setImageResource(R.drawable.inselect);
+//                datasBean.setIsSelect_shop(false);
             }
         });
+
+
 
 
         return itemView;
@@ -128,27 +222,39 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
     @SuppressLint({"SetTextI18n", "ResourceAsColor"})
     @Override
     public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
-        View itemView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_child, viewGroup, false);
+        View itemViewChild = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_child, viewGroup, false);
         ShoppingCarDataBean.DatasBean datasBean = datasBeans.get(i);
         ShoppingCarDataBean.DatasBean.GoodsBean goodsBean = datasBean.getGoods().get(i1);
 
-        ImageView select = itemView.findViewById(R.id.select_id);
-        TextView goodName = itemView.findViewById(R.id.textView1);
-        TextView goodPrice = itemView.findViewById(R.id.textView2);
-        TextView goodNum = itemView.findViewById(R.id.textView3);
-        ImageView minus = itemView.findViewById(R.id.minus_id);
-        ImageView plus = itemView.findViewById(R.id.plus_id);
+        ImageView select = itemViewChild.findViewById(R.id.select_id);
+        TextView goodName = itemViewChild.findViewById(R.id.textView1);
+        TextView goodPrice = itemViewChild.findViewById(R.id.textView2);
+        TextView goodNum = itemViewChild.findViewById(R.id.textView3);
+        ImageView minus = itemViewChild.findViewById(R.id.minus_id);
+        ImageView plus = itemViewChild.findViewById(R.id.plus_id);
 
         goodName.setText(goodsBean.getGoods_name());
         goodPrice.setText("￥" + goodsBean.getGoods_price());
-        goodPrice.setTextColor(R.color.red);
-        goodNum.setText("0");
+//        goodPrice.setTextColor(R.color.red);
+        goodNum.setText("1");
+
+        Log.d(TAG, "--------test--------: " + datasBeans.get(1).toString());
+
+
+
+        if (datasBeans.get(i).getGoods().get(i1).getIsSelect()){
+            Log.d(TAG, "getChildView: \\\\\\\\\\\\\\" + i + "||" + i1 + "t" + datasBeans.get(i).getGoods().get(i1).getIsSelect());
+            select.setImageResource(R.drawable.select);
+        }else {
+            Log.d(TAG, "getChildView: \\\\\\\\\\\\\\" + i + "||" + i1 + "f" + datasBeans.get(i).getGoods().get(i1).getIsSelect());
+            select.setImageResource(R.drawable.inselect);
+        }
 
         minus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int num = Integer.parseInt(goodNum.getText().toString());
-                if (num > 0){
+                if (num > 1){
                     num = num - 1;
                     goodNum.setText(String.valueOf(num));
                 }
@@ -168,13 +274,21 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
             @Override
             public void onClick(View view) {
                 boolean isSelect = goodsBean.getIsSelect();
-                if (!isSelect){
+                goodsBean.setIsSelect(!isSelect);
+                if (goodsBean.getIsSelect()){
                     select.setImageResource(R.drawable.select);
-                    goodsBean.setIsSelect(true);
-                    return;
+                }else {
+                    select.setImageResource(R.drawable.inselect);
                 }
-                select.setImageResource(R.drawable.inselect);
-                goodsBean.setIsSelect(false);
+                notifyDataSetChanged();
+
+//                if (!isSelect){
+//                    select.setImageResource(R.drawable.select);
+//                    goodsBean.setIsSelect(true);
+//                    return;
+//                }
+//                select.setImageResource(R.drawable.inselect);
+//                goodsBean.setIsSelect(false);
 
             }
         });
@@ -186,7 +300,7 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 //        }
 
 
-        return itemView;
+        return itemViewChild;
     }
 
 

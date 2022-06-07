@@ -3,14 +3,85 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <TextView
+            android:id="@+id/update_id"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginStart="-20dp"
+            android:text="刷新数据"
+            android:textSize="16sp"
+            android:textColor="@color/black"/>
+        <TextView
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="购物车"
+            android:textSize="20sp"
+            android:textColor="@color/black"/>
+        <TextView
+            android:id="@+id/edit_id"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginEnd="-20dp"
+            android:text="编辑"
+            android:textSize="16sp"
+            android:textColor="@color/black"/>
+
+
+    </LinearLayout>
+
     <ExpandableListView
         android:id="@+id/elv_id"
+        android:layout_weight="13"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:groupIndicator="@null"
-        />
+        android:layout_height="0dp"
+        android:groupIndicator="@null" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+
+        <TextView
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="-30dp"
+            android:text="全选"
+            android:background="#cccccc"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:gravity="center"/>
+        <TextView
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="合计： ￥0.00"
+            android:background="#cccccc"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:gravity="center" />
+        <Button
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="去结算"
+            android:textColor="@color/white"
+            android:background="@color/red"/>
+    </LinearLayout>
 </LinearLayout>
