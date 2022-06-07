@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 
 import com.example.myshoppingcar.adapter.ShoppingCarAdapter;
 import com.example.myshoppingcar.bean.ShoppingCarDataBean;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
             "}";
     private ExpandableListView listView;
     private List<ShoppingCarDataBean.DatasBean> storeList;
+    private TextView selectAll;
+    private TextView allPrice;
 
 
     @Override
@@ -173,11 +176,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void init(){
         listView = this.findViewById(R.id.elv_id);
+        selectAll = this.findViewById(R.id.selectAll_id);
+        allPrice = this.findViewById(R.id.allPrice_id);
 //        listView.setAdapter();
     }
 
     private void initExpandableListView(){
-        ShoppingCarAdapter adapter = new ShoppingCarAdapter(storeList);
+        ShoppingCarAdapter adapter = new ShoppingCarAdapter(storeList,selectAll,allPrice);
         listView.setAdapter(adapter);
 
 

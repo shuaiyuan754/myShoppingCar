@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myshoppingcar.R;
 import com.example.myshoppingcar.bean.ShoppingCarDataBean;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Inflater;
 
@@ -26,12 +28,20 @@ import java.util.zip.Inflater;
 public class ShoppingCarAdapter extends BaseExpandableListAdapter {
     private static final String TAG = "ShoppingCarAdapter";
 
+    private TextView allPrice;
+    private Boolean isSelectAll = false;
+    private TextView selectAll;
     private List<ShoppingCarDataBean.DatasBean> datasBeans;
-//    private ViewHolder holder;
+    private double all = 0;
+    private int n = 0;
+//    private ArrayList<Boolean> selects = new ArrayList<>();
+    //    private ViewHolder holder;
 
 
-    public ShoppingCarAdapter(List<ShoppingCarDataBean.DatasBean> datasBeans) {
+    public ShoppingCarAdapter(List<ShoppingCarDataBean.DatasBean> datasBeans,TextView selectAll,TextView allPrice) {
         this.datasBeans = datasBeans;
+        this.selectAll = selectAll;
+        this.allPrice = allPrice;
     }
 
 //
@@ -142,10 +152,10 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
         //店铺是否在购物车中被选中
         final boolean isSelect_shop = datasBean.getIsSelect_shop();
         if (isSelect_shop) {
-//            Log.d(TAG, "true: " + holder.selectIcon);
+            Log.d(TAG, "true: ");
             selectIcon.setImageResource(R.drawable.select);
         } else {
-//            Log.d(TAG, "false: " + holder.selectIcon);
+            Log.d(TAG, "false: ");
             selectIcon.setImageResource(R.drawable.inselect);
         }
 //        notifyDataSetChanged();
@@ -206,6 +216,33 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
             }
         });
 
+        //全选
+        selectAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+//                for (int j = 0; j < datasBeans.size(); j++) {
+//                    datasBeans.get(j).setIsSelect_shop(!isSelectAll);
+//                }
+//                notifyDataSetChanged();
+
+
+                isSelectAll = !isSelectAll;
+
+                for (int i = 0; i < datasBeans.size(); i++) {
+                    List<ShoppingCarDataBean.DatasBean.GoodsBean> goods = datasBeans.get(i).getGoods();
+                    for (int j = 0; j < goods.size(); j++) {
+                        ShoppingCarDataBean.DatasBean.GoodsBean goodsBean = goods.get(j);
+                        goodsBean.setIsSelect(isSelectAll);
+                    }
+                }
+
+                notifyDataSetChanged();
+
+
+            }
+        });
+
 
 
 
@@ -233,10 +270,11 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
         ImageView minus = itemViewChild.findViewById(R.id.minus_id);
         ImageView plus = itemViewChild.findViewById(R.id.plus_id);
 
+        goodNum.setText(datasBean.getGoods().get(i1).getGoods_num());
         goodName.setText(goodsBean.getGoods_name());
         goodPrice.setText("￥" + goodsBean.getGoods_price());
 //        goodPrice.setTextColor(R.color.red);
-        goodNum.setText("1");
+//        goodNum.setText("1");
 
         Log.d(TAG, "--------test--------: " + datasBeans.get(1).toString());
 
@@ -256,8 +294,12 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
                 int num = Integer.parseInt(goodNum.getText().toString());
                 if (num > 1){
                     num = num - 1;
+                    datasBean.getGoods().get(i1).setGoods_num(num + "");
                     goodNum.setText(String.valueOf(num));
+                    Log.d(TAG, "_______num-_______: " + datasBean.getGoods().get(i1).getGoods_num());
                 }
+                notifyDataSetChanged();
+
             }
         });
 
@@ -266,7 +308,10 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
             public void onClick(View view) {
                 int num = Integer.parseInt(goodNum.getText().toString());
                 num = num + 1;
+                datasBean.getGoods().get(i1).setGoods_num(num + "");
                 goodNum.setText(String.valueOf(num));
+                Log.d(TAG, "_______num+_______: " + datasBean.getGoods().get(i1).getGoods_num());
+                notifyDataSetChanged();
             }
         });
 
@@ -297,6 +342,45 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 //        if (datasBean.getIsSelect_shop()){
 //            select.setImageResource(R.drawable.select);
 //            datasBean.getGoods().get(i1).setIsSelect(true);
+//        }
+
+
+        boolean isSelect = datasBean.getGoods().get(i1).getIsSelect();
+
+//
+//        selects.add(isSelect);
+//        Log.d(TAG, "getChildView: ====Bollean====" + selects);
+//
+//        for (int j = 0; j < selects.size(); j++) {
+//            if (selects.get(j)){
+//                break;
+//            }
+//            allPrice.setText("合计： ￥0.00");
+//        }
+
+//        Log.d(TAG, "getChildView: ===num===" + selects.size());
+
+        if (isSelect) {
+            double goods_price = Double.parseDouble(datasBean.getGoods().get(i1).getGoods_price());
+            int num = Integer.parseInt(goodNum.getText().toString());
+            double a = goods_price * num;
+            all = all + a;
+
+
+            @SuppressLint("DefaultLocale") String finalPrice = String.format("%.2f", all);
+            Log.d(TAG, "getChildView: ---------------0607------------" + goods_price + "*" + num);
+
+
+            allPrice.setText("合计： ￥" + finalPrice);
+
+            all = 0;
+
+
+        }
+
+
+//        }else {
+//            allPrice.setText("合计： ￥0.00");
 //        }
 
 
