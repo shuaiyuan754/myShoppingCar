@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myshoppingcar.R;
 import com.example.myshoppingcar.bean.ShoppingCarDataBean;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Inflater;
@@ -32,8 +33,7 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
     private Boolean isSelectAll = false;
     private TextView selectAll;
     private List<ShoppingCarDataBean.DatasBean> datasBeans;
-    private double all = 0;
-    private int n = 0;
+    private double all;
 //    private ArrayList<Boolean> selects = new ArrayList<>();
     //    private ViewHolder holder;
 
@@ -280,6 +280,7 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 
 
 
+
         if (datasBeans.get(i).getGoods().get(i1).getIsSelect()){
             Log.d(TAG, "getChildView: \\\\\\\\\\\\\\" + i + "||" + i1 + "t" + datasBeans.get(i).getGoods().get(i1).getIsSelect());
             select.setImageResource(R.drawable.select);
@@ -345,38 +346,54 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 //        }
 
 
-        boolean isSelect = datasBean.getGoods().get(i1).getIsSelect();
 
-//
-//        selects.add(isSelect);
-//        Log.d(TAG, "getChildView: ====Bollean====" + selects);
-//
-//        for (int j = 0; j < selects.size(); j++) {
-//            if (selects.get(j)){
-//                break;
-//            }
-//            allPrice.setText("合计： ￥0.00");
-//        }
+        //合计
+        all = 0.0;
+        allPrice.setText("合计： ￥0.00");
+        for (int x = 0; x < datasBeans.size(); x++) {
+            List<ShoppingCarDataBean.DatasBean.GoodsBean> goods = datasBeans.get(x).getGoods();
+            for (int y = 0; y < goods.size(); y++) {
+                ShoppingCarDataBean.DatasBean.GoodsBean good = goods.get(y);
+                boolean isSelect = good.getIsSelect();
+                if (isSelect) {
+                    String num = good.getGoods_num();
+                    String price = good.getGoods_price();
 
+                    double v = Double.parseDouble(num);
+                    double v1 = Double.parseDouble(price);
+
+                    all = all + v * v1;
+
+                    @SuppressLint("DefaultLocale") String finalPrice = String.format("%.2f", all);
+                    allPrice.setText("合计： ￥" + finalPrice);
+                }
+            }
+        }
+
+
+
+//        boolean isSelect = datasBean.getGoods().get(i1).getIsSelect();
 //        Log.d(TAG, "getChildView: ===num===" + selects.size());
 
-        if (isSelect) {
-            double goods_price = Double.parseDouble(datasBean.getGoods().get(i1).getGoods_price());
-            int num = Integer.parseInt(goodNum.getText().toString());
-            double a = goods_price * num;
-            all = all + a;
-
-
-            @SuppressLint("DefaultLocale") String finalPrice = String.format("%.2f", all);
-            Log.d(TAG, "getChildView: ---------------0607------------" + goods_price + "*" + num);
-
-
-            allPrice.setText("合计： ￥" + finalPrice);
-
-            all = 0;
-
-
-        }
+//        allPrice.setText("0000");
+//        all = 0;
+//        if (isSelect) {
+//            double goods_price = Double.parseDouble(datasBean.getGoods().get(i1).getGoods_price());
+//            int num = Integer.parseInt(goodNum.getText().toString());
+//            double a = goods_price * num;
+//            all = all + a;
+//
+//
+//            @SuppressLint("DefaultLocale") String finalPrice = String.format("%.2f", all);
+//            Log.d(TAG, "getChildView: ---------------0607------------" + goods_price + "*" + num);
+//
+//
+//            allPrice.setText("合计： ￥" + finalPrice);
+//
+//
+//
+//
+//        }不可取，一直再循环内部
 
 
 //        }else {
@@ -386,7 +403,6 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 
         return itemViewChild;
     }
-
 
     @Override
     public boolean isChildSelectable(int i, int i1) {
