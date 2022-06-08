@@ -43,7 +43,7 @@ public class ShoppingCarDataBean implements Cloneable{
 
         @NonNull
         @Override
-        protected DatasBean clone() throws CloneNotSupportedException {
+        public DatasBean clone() throws CloneNotSupportedException {
             return (DatasBean) super.clone();
         }
 

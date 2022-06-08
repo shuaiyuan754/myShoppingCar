@@ -44,7 +44,28 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:id="@+id/background_id"
+        android:layout_weight="13"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/ic_launcher_background"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="购物车竟然是空的!"
+            android:textSize="24sp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
     <ExpandableListView
+        android:visibility="visible"
         android:id="@+id/elv_id"
         android:layout_weight="13"
         android:layout_width="match_parent"
@@ -52,10 +73,10 @@
         android:groupIndicator="@null" />
 
     <LinearLayout
+        android:id="@+id/bottom_id"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        >
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/selectAll_id"
@@ -86,5 +107,26 @@
             android:text="去结算"
             android:textColor="@color/white"
             android:background="@color/red"/>
+        <TextView
+            android:id="@+id/blank_id"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="#cccccc"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:visibility="gone"
+            android:gravity="center" />
+        <Button
+            android:id="@+id/btnDelete_id"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="删除"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:background="@color/red"/>
+
     </LinearLayout>
+
 </LinearLayout>

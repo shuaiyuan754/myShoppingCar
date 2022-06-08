@@ -34,16 +34,25 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
     private TextView selectAll;
     private List<ShoppingCarDataBean.DatasBean> datasBeans;
     private double all;
+    private Button commit;
+    private Button delete;
 //    private ArrayList<Boolean> selects = new ArrayList<>();
     //    private ViewHolder holder;
 
 
-    public ShoppingCarAdapter(List<ShoppingCarDataBean.DatasBean> datasBeans,TextView selectAll,TextView allPrice) {
+    public ShoppingCarAdapter(List<ShoppingCarDataBean.DatasBean> datasBeans, TextView selectAll, TextView allPrice, Button commit, Button delete) {
         this.datasBeans = datasBeans;
         this.selectAll = selectAll;
         this.allPrice = allPrice;
+        this.commit = commit;
+        this.delete = delete;
     }
 
+
+    public void setData(List<ShoppingCarDataBean.DatasBean> data) {
+        this.datasBeans = data;
+        notifyDataSetChanged();
+    }
 //
 //    public static class ViewHolder extends RecyclerView.ViewHolder {
 //        ImageView selectIcon;
@@ -246,6 +255,9 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 
 
 
+
+
+
         return itemView;
     }
 
@@ -276,7 +288,7 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 //        goodPrice.setTextColor(R.color.red);
 //        goodNum.setText("1");
 
-        Log.d(TAG, "--------test--------: " + datasBeans.get(1).toString());
+//        Log.d(TAG, "--------test--------: " + datasBeans.get(1).toString());
 
 
 
@@ -401,6 +413,20 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 //        }
 
 
+        //删除的点击事件
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /**
+                 * 实际开发中，通过回调请求后台接口实现删除操作
+                 */
+                if (mListener != null) {
+                    mListener.delete();
+                }
+            }
+        });
+
+
         return itemViewChild;
     }
 
@@ -408,4 +434,23 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
     public boolean isChildSelectable(int i, int i1) {
         return false;
     }
+
+
+    //接口
+    public interface OnDeleteListener{
+        void delete();
+    }
+
+    public void setOnDeleteListener(OnDeleteListener listener){
+        mListener = listener;
+    }
+
+    public OnDeleteListener mListener;
+
+
+
+
 }
+
+
+

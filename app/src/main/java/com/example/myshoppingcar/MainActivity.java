@@ -1,23 +1,30 @@
 package com.example.myshoppingcar;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myshoppingcar.adapter.ShoppingCarAdapter;
 import com.example.myshoppingcar.bean.ShoppingCarDataBean;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-
+    private List<ShoppingCarDataBean.DatasBean> datasTemp;
+    private int n = 0;
     private String data = "{\n" +
             "    \"code\": 200,\n" +
             "    \"datas\": [\n" +
@@ -87,6 +94,14 @@ public class MainActivity extends AppCompatActivity {
     private List<ShoppingCarDataBean.DatasBean> storeList;
     private TextView selectAll;
     private TextView allPrice;
+    private Button commit;
+    private TextView update;
+    private TextView edit;
+    private TextView blank;
+    private Button delete;
+    private ShoppingCarAdapter adapter;
+    private LinearLayout ll;
+    private LinearLayout background;
 
 
     @Override
@@ -159,17 +174,58 @@ public class MainActivity extends AppCompatActivity {
 //                "        }\n" +
 //                "    ]\n" +
 //                "}";
-        Gson gson = new Gson();
-        ShoppingCarDataBean shoppingCarDataBean = gson.fromJson(data, ShoppingCarDataBean.class);
-        storeList = shoppingCarDataBean.getDatas();
-        Log.d(TAG, "store: " + storeList);
-        Log.d(TAG, "good: " + storeList.get(1).getGoods());
 
+        initData();
 
 
         init();
 
         initExpandableListView();
+
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initData();
+                initExpandableListView();
+                ll.setVisibility(View.VISIBLE);
+                blank.setVisibility(View.GONE);
+                delete.setVisibility(View.GONE);
+                allPrice.setVisibility(View.VISIBLE);
+                commit.setVisibility(View.VISIBLE);
+                listView.setVisibility(View.VISIBLE);
+                background.setVisibility(View.GONE);
+                edit.setText("编辑");
+            }
+        });
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String editText = edit.getText().toString();
+                if (editText.equals("编辑")) {
+                    edit.setText("完成");
+                    allPrice.setVisibility(View.GONE);
+                    commit.setVisibility(View.GONE);
+                    blank.setVisibility(View.VISIBLE);
+                    delete.setVisibility(View.VISIBLE);
+                } else if (editText.equals("完成")) {
+
+                    blank.setVisibility(View.GONE);
+                    delete.setVisibility(View.GONE);
+                    allPrice.setVisibility(View.VISIBLE);
+                    commit.setVisibility(View.VISIBLE);
+                    edit.setText("编辑");
+                }
+            }
+        });
+
+    }
+
+    private void initData() {
+        Gson gson = new Gson();
+        ShoppingCarDataBean shoppingCarDataBean = gson.fromJson(data, ShoppingCarDataBean.class);
+        storeList = shoppingCarDataBean.getDatas();
+        Log.d(TAG, "store: " + storeList);
+        Log.d(TAG, "good: " + storeList.get(1).getGoods());
 
     }
 
@@ -178,12 +234,79 @@ public class MainActivity extends AppCompatActivity {
         listView = this.findViewById(R.id.elv_id);
         selectAll = this.findViewById(R.id.selectAll_id);
         allPrice = this.findViewById(R.id.allPrice_id);
+        commit = this.findViewById(R.id.btn_id);
+        update = this.findViewById(R.id.update_id);
+        edit = this.findViewById(R.id.edit_id);
+        blank = this.findViewById(R.id.blank_id);
+        delete = this.findViewById(R.id.btnDelete_id);
+        ll = this.findViewById(R.id.bottom_id);
+        background = this.findViewById(R.id.background_id);
 //        listView.setAdapter();
     }
 
     private void initExpandableListView(){
-        ShoppingCarAdapter adapter = new ShoppingCarAdapter(storeList,selectAll,allPrice);
+        adapter = new ShoppingCarAdapter(storeList,selectAll,allPrice,commit,delete);
         listView.setAdapter(adapter);
+
+        adapter.setOnDeleteListener(new ShoppingCarAdapter.OnDeleteListener() {
+
+
+            @Override
+            public void delete() {
+
+                //判断是否有店铺或商品被选中
+                //true为有，则需要刷新数据；反之，则不需要；
+                boolean hasSelect = false;
+                //创建临时的List，用于存储没有被选中的购物车数据
+                datasTemp = new ArrayList<>();
+
+                for (int i = 0; i < storeList.size(); i++) {
+                    List<ShoppingCarDataBean.DatasBean.GoodsBean> goods = storeList.get(i).getGoods();
+                    boolean isSelect_shop = storeList.get(i).getIsSelect_shop();
+
+                    if (isSelect_shop) {
+                        hasSelect = true;
+                        //跳出本次循环，继续下次循环。
+                        continue;
+                    } else {
+                        try {
+                            datasTemp.add(storeList.get(i).clone());
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                        }
+                        datasTemp.get(datasTemp.size() - 1).setGoods(new ArrayList<ShoppingCarDataBean.DatasBean.GoodsBean>());
+                    }
+
+                    for (int y = 0; y < goods.size(); y++) {
+                        ShoppingCarDataBean.DatasBean.GoodsBean goodsBean = goods.get(y);
+                        boolean isSelect = goodsBean.getIsSelect();
+
+                        if (isSelect) {
+                            hasSelect = true;
+                        } else {
+                            datasTemp.get(datasTemp.size() - 1).getGoods().add(goodsBean);
+                        }
+                        n = n + 1;
+
+
+
+//                        if (datasTemp.size() == 0){
+//                            ll.setVisibility(View.GONE);
+//                        }
+                    }
+                }
+                Log.d(TAG, "falseNum: " + n);
+
+
+                if (hasSelect) {
+//                    showDeleteDialog(datasTemp);
+                    dialog();
+                } else {
+                    Toast.makeText(MainActivity.this, "请选择", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
 
 
         //展开所有组
@@ -197,6 +320,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void dialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setIcon(R.drawable.ic_launcher_background)
+                .setTitle("WARNING!")
+                .setMessage("确定要删除商品吗？")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        storeList = datasTemp;
+                        adapter.setData(storeList);
+                        if (n == 0){
+                            ll.setVisibility(View.GONE);
+                            listView.setVisibility(View.GONE);
+                            background.setVisibility(View.VISIBLE);
+                        }
+                        n = 0;
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                })
+                .create()
+                .show();
     }
 }
 
