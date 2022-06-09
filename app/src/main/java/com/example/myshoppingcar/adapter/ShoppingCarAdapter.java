@@ -1,6 +1,7 @@
 package com.example.myshoppingcar.adapter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +11,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myshoppingcar.MainActivity;
 import com.example.myshoppingcar.R;
 import com.example.myshoppingcar.bean.ShoppingCarDataBean;
 
@@ -36,16 +39,18 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
     private double all;
     private Button commit;
     private Button delete;
+    private Context context;
 //    private ArrayList<Boolean> selects = new ArrayList<>();
     //    private ViewHolder holder;
 
 
-    public ShoppingCarAdapter(List<ShoppingCarDataBean.DatasBean> datasBeans, TextView selectAll, TextView allPrice, Button commit, Button delete) {
+    public ShoppingCarAdapter(Context context, List<ShoppingCarDataBean.DatasBean> datasBeans, TextView selectAll, TextView allPrice, Button commit, Button delete) {
         this.datasBeans = datasBeans;
         this.selectAll = selectAll;
         this.allPrice = allPrice;
         this.commit = commit;
         this.delete = delete;
+        this.context = context;
     }
 
 
@@ -251,6 +256,57 @@ public class ShoppingCarAdapter extends BaseExpandableListAdapter {
 
             }
         });
+
+
+        commit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                //创建临时的List，用于存储有商品被选中的店铺
+                List<ShoppingCarDataBean.DatasBean> tempStores = new ArrayList<>();
+                for (int i = 0; i < datasBeans.size(); i++) {
+                    //店铺中是否有商品被选中
+                    boolean hasGoodsSelect = false;
+                    //创建临时的List，用于存储被选中的商品
+                    List<ShoppingCarDataBean.DatasBean.GoodsBean> tempGoods = new ArrayList<>();
+
+                    ShoppingCarDataBean.DatasBean storesBean = datasBeans.get(i);
+                    List<ShoppingCarDataBean.DatasBean.GoodsBean> goods = storesBean.getGoods();
+                    for (int y = 0; y < goods.size(); y++) {
+                        ShoppingCarDataBean.DatasBean.GoodsBean goodsBean = goods.get(y);
+                        boolean isSelect = goodsBean.getIsSelect();
+                        if (isSelect) {
+                            hasGoodsSelect = true;
+                            tempGoods.add(goodsBean);
+                        }
+                    }
+
+                    if (hasGoodsSelect) {
+                        ShoppingCarDataBean.DatasBean storeBean = new ShoppingCarDataBean.DatasBean();
+                        storeBean.setStore_id(storesBean.getStore_id());
+                        storeBean.setStore_name(storesBean.getStore_name());
+                        storeBean.setGoods(tempGoods);
+
+                        tempStores.add(storeBean);
+                    }
+                }
+
+                if (tempStores != null && tempStores.size() > 0) {//如果有被选中的
+                    /**
+                     * 实际开发中，如果有被选中的商品，
+                     * 则跳转到确认订单页面，完成后续订单流程。
+                     */
+                    Toast.makeText(context, "拿到数据跳转订单界面", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "请选择要购买的商品", Toast.LENGTH_SHORT).show();
+                }
+                
+                
+                
+            }
+        });
+
 
 
 

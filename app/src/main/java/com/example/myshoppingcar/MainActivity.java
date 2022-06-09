@@ -4,6 +4,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private List<ShoppingCarDataBean.DatasBean> datasTemp;
     private int n = 0;
+    private Context context = this;
     private String data = "{\n" +
             "    \"code\": 200,\n" +
             "    \"datas\": [\n" +
@@ -245,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initExpandableListView(){
-        adapter = new ShoppingCarAdapter(storeList,selectAll,allPrice,commit,delete);
+        adapter = new ShoppingCarAdapter(context,storeList,selectAll,allPrice,commit,delete);
         listView.setAdapter(adapter);
 
         adapter.setOnDeleteListener(new ShoppingCarAdapter.OnDeleteListener() {
